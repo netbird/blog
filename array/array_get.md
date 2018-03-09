@@ -1,49 +1,77 @@
 ## array_get
 
 ----
-参照网上的说明自己亲手敲下代码, 作为php扩展的入门吧。
-
+先来看看php的实现：
 ```php
-    // php函数
-    function self_concat($string, $n){
-        $result = "";
-        for($i = 0; $i < $n; $i++){
-            $result .= $string;
+    function array_get($array, $key, $default = null)
+    {
+        if (is_null($key)) {
+            return $array; 
         }
-        return $result;
+
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (! is_array($array) || ! array_key_exists($segment, $array)) {
+                return value($default);
+            }
+
+            $array = $array[$segment];
+        }
+
+        return $array;
     }
 
 ```
 
-用扩展方式实现：
-
+用扩展实现如下(没有考虑key为空的情况):
 ```c
-PHP_FUNCTION(self_concats)
-{
-	char *str = NULL;
-	size_t str_len;
-	zend_long n;
-	zend_long i;
-	char *result; /* point to result*/
-	char *ptr;
-	size_t result_len;
-
-	/** 接收变量 */
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "sl", &str, &str_len, &n) == FAILURE) {
-		return;
-	}
-
-	result_len = str_len * n;
-	result = (char *)emalloc(result_len + 1);  // 分配空间
-	ptr = result;
-
-    while(n--) {
-		memcpy(ptr, str, str_len);
-		ptr += str_len;
-	}
-	// add end flag
-	*ptr = '\0';
-	RETURN_STRINGL(result, result_len);
-}
+    PHP_FUNCTION(array_get)
+    {
+    	zval *arr; // array
+    	zend_string* strkey; // key
+    	zval *defaultval = NULL; // default value
+    	zval *retval;
+    	HashTable *arrHashTable;
+    	zval *dest_entry;
+    	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zS|z", &arr, &strkey, &defaultval) == FAILURE) {
+    		return;
+    	}
+    	if ((retval = zend_hash_find(Z_ARRVAL_P(arr), strkey)) != NULL){
+    		RETURN_ZVAL(retval, 1, 0);
+    	} 
+    	// foreach
+    	if (zend_memrchr(ZSTR_VAL(strkey), '.', ZSTR_LEN(strkey))) {
+    		char *entry, *ptr, *seg;
+    		HashTable *target = Z_ARRVAL_P(arr);
+    		entry = estrndup(ZSTR_VAL(strkey), ZSTR_LEN(strkey));
+    		if ((seg = php_strtok_r(entry, ".", &ptr))) {
+    			do {
+    				if (target == NULL || (retval = zend_symtable_str_find(target, seg, strlen(seg))) == NULL) {
+    					break;
+    				}
+    
+    				if (Z_TYPE_P(retval) == IS_ARRAY) {
+    					target = Z_ARRVAL_P(retval);
+    				} else {
+    					target = NULL;
+    				}
+    			} while ((seg = php_strtok_r(NULL, ".", &ptr)));
+    		}
+    		efree(entry);
+    		if (retval) {
+    			RETURN_ZVAL(retval, 1, 0);
+    		}
+    	}
+    	// end foreach
+    	if (defaultval) {
+    	    // 如果有默认值，则返回默认值
+    		RETURN_ZVAL(defaultval, 1, 0);
+    	} else {
+    		RETURN_NULL();
+    	}
+    }
 
 ```

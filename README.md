@@ -13,6 +13,7 @@
 
 ## base function
 >* [self_concats](https://netbird.github.io/blog/array/self_concats)
+>* [array_get](https://netbird.github.io/blog/array/array_get)
 
 ## extension
 >* [yaconf](https://netbird.github.io/blog/extend/yaconf)

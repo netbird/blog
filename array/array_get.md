@@ -37,29 +37,29 @@
     	HashTable *arrHashTable;
     	zval *dest_entry;
     	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zS|z", &arr, &strkey, &defaultval) == FAILURE) {
-    		return;
+    	    return;
     	}
     	if ((retval = zend_hash_find(Z_ARRVAL_P(arr), strkey)) != NULL){
-    		RETURN_ZVAL(retval, 1, 0);
+    	    RETURN_ZVAL(retval, 1, 0);
     	} 
     	// foreach
     	if (zend_memrchr(ZSTR_VAL(strkey), '.', ZSTR_LEN(strkey))) {
-    		char *entry, *ptr, *seg;
-    		HashTable *target = Z_ARRVAL_P(arr);
-    		entry = estrndup(ZSTR_VAL(strkey), ZSTR_LEN(strkey));
-    		if ((seg = php_strtok_r(entry, ".", &ptr))) {
-    			do {
-    				if (target == NULL || (retval = zend_symtable_str_find(target, seg, strlen(seg))) == NULL) {
-    					break;
-    				}
-    
-    				if (Z_TYPE_P(retval) == IS_ARRAY) {
-    					target = Z_ARRVAL_P(retval);
-    				} else {
-    					target = NULL;
-    				}
-    			} while ((seg = php_strtok_r(NULL, ".", &ptr)));
-    		}
+            char *entry, *ptr, *seg;
+            HashTable *target = Z_ARRVAL_P(arr);
+            entry = estrndup(ZSTR_VAL(strkey), ZSTR_LEN(strkey));
+            if ((seg = php_strtok_r(entry, ".", &ptr))) {
+                do {
+                    if (target == NULL || (retval = zend_symtable_str_find(target, seg, strlen(seg))) == NULL) {
+                        break;
+                    }
+            
+                    if (Z_TYPE_P(retval) == IS_ARRAY) {
+                        target = Z_ARRVAL_P(retval);
+                    } else {
+                        target = NULL;
+                    }
+                } while ((seg = php_strtok_r(NULL, ".", &ptr)));
+            }
     		efree(entry);
     		if (retval) {
     			RETURN_ZVAL(retval, 1, 0);

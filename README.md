@@ -12,7 +12,7 @@
 目录:
 
 ## base function
->* [self_concats] (array/self_concats.md)
+>* [self_concats](https://netbird.github.io/blog/array/self_concats)
 
 
 ---

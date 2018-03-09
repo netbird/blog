@@ -9,6 +9,12 @@
 >* 一些经验总结
 >* 一起分析一些扩展开发
 
+目录:
+
+## base function
+>* [self_concats] (array/self_concats.md)
+
+
 ---
 ### 微博：[@福愿_飞鸟](https://weibo.com/teacherbird/home?wvr=5)
 

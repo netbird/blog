@@ -14,7 +14,8 @@
 ## base function
 >* [self_concats](https://netbird.github.io/blog/array/self_concats)
 
-
+## extension
+>* [yaconf](https://netbird.github.io/blog/extend/yaconf)
 ---
 ### 微博：[@福愿_飞鸟](https://weibo.com/teacherbird/home?wvr=5)
 

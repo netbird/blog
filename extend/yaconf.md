@@ -57,7 +57,8 @@ END_EXTERN_C()
 ```
 3. 判断是否是已经加载的配置文件，如果有则比对文件的mtime，相等则pass。
 ```c
-    if ((node = (yaconf_filenode*)zend_hash_str_find_ptr(parsed_ini_files, namelist[i]->d_name, strlen(namelist[i]->d_name))) == NULL) {
+    if ((node = (yaconf_filenode*)zend_hash_str_find_ptr(parsed_ini_files, 
+    namelist[i]->d_name, strlen(namelist[i]->d_name))) == NULL) {
         YACONF_DEBUG("new configure file found");
     } else if (node->mtime == sb.st_mtime) {
         free(namelist[i]);
@@ -66,15 +67,15 @@ END_EXTERN_C()
 ```
 4. 进行对ini文件进行解析，这里调用了zend_parse_ini_file这个方法。这个方法应该是可以传入解析规则的解析方法，在php源码中有使用的例子。
 ```c
-if (zend_parse_ini_file(&fh, 1, 0 /* ZEND_INI_SCANNER_NORMAL */,
-        php_yaconf_ini_parser_cb, (void *)&result) == FAILURE || YACONF_G(parse_err)) {
-    YACONF_G(parse_err) = 0;
-    php_yaconf_hash_destroy(Z_ARRVAL(result));
-    free(namelist[i]);
-    continue;
-}
-
+    if (zend_parse_ini_file(&fh, 1, 0 /* ZEND_INI_SCANNER_NORMAL */,
+            php_yaconf_ini_parser_cb, (void *)&result) == FAILURE || YACONF_G(parse_err)) {
+        YACONF_G(parse_err) = 0;
+        php_yaconf_hash_destroy(Z_ARRVAL(result));
+        free(namelist[i]);
+        continue;
+    }
 ```
+
 5. 如果是对已有配置的更新，则先删除之前的配置。然后挂载新的配置。如果是新的则直接更新hashtable ini_containers。
 并且同步更新记录加载了文件信息的hashtable parsed_ini_files，如果是update则直接 更新对应节点的mtime, 如果是新增的，则用zend_hash_update_mem添加一条。
 ```c

@@ -27,112 +27,80 @@ END_EXTERN_C()
 在yaconf.c中实现上面这个php_yaconf_update方法, 基本copy了PHP_RINIT_FUNCTION中的逻辑。
 检测是否存在check_delay这个字段和是否超过单次时间检测，如果没有超过则返回。
 
-```coffeescript
+```c
     if (YACONF_G(check_delay) && (time(NULL) - YACONF_G(last_check) < YACONF_G(check_delay))) {
 		// 检测时间 
 		YACONF_DEBUG("config check delay doesn't execceed, ignore");
 		return SUCCESS;
 	}
 ```
-如果符合条件则继续向下执行。
+如果符合更新条件则继续向下执行。然后检测配置目录的字符串是否为目录。如果检测到之前记录的时间和目录的mtime相同则不向下执行。
+然后进行遍历文件夹的文件。注意:这里不会去遍历配置文件夹下的二层文件夹的内容。
+对于每个文件进行如下检测：
 
-```php
-    char *dirname;
-    struct zend_stat dir_sb = {0};
+1. 检测文件名字是否是abc.ini的格式，如果出现其他格式则pass。
+```c
+    if (!(p = strrchr(namelist[i]->d_name, '.')) || strcmp(p, ".ini")) {
+        // 返回 . 首次出现的位置，并且返回从这个开始的字符串
+        // 所以 a.b.ini 不符合条件
+        free(namelist[i]);
+        continue;
+    }
+```
+2. 判断是否是常规文件，不是则pass。
+```c
+    // 单个文件目录+文件  最多255个字符
+    if (VCWD_STAT(ini_file, &sb) || !S_ISREG(sb.st_mode)) {
+        free(namelist[i]);
+        continue;
+    }
+```
+3. 判断是否是已经加载的配置文件，如果有则比对文件的mtime，相等则pass。
+```c
+    if ((node = (yaconf_filenode*)zend_hash_str_find_ptr(parsed_ini_files, namelist[i]->d_name, strlen(namelist[i]->d_name))) == NULL) {
+        YACONF_DEBUG("new configure file found");
+    } else if (node->mtime == sb.st_mtime) {
+        free(namelist[i]);
+        continue;
+    }
+```
+4. 进行对ini文件进行解析，这里调用了zend_parse_ini_file这个方法。这个方法应该是可以传入解析规则的解析方法，在php源码中有使用的例子。
+```c
+if (zend_parse_ini_file(&fh, 1, 0 /* ZEND_INI_SCANNER_NORMAL */,
+        php_yaconf_ini_parser_cb, (void *)&result) == FAILURE || YACONF_G(parse_err)) {
+    YACONF_G(parse_err) = 0;
+    php_yaconf_hash_destroy(Z_ARRVAL(result));
+    free(namelist[i]);
+    continue;
+}
 
-    YACONF_G(last_check) = time(NULL);
-    // 更新最后检测时间 为现在
+```
+5. 如果是对已有配置的更新，则先删除之前的配置。然后挂载新的配置。如果是新的则直接更新hashtable ini_containers。
+并且同步更新记录加载了文件信息的hashtable parsed_ini_files，如果是update则直接 更新对应节点的mtime, 如果是新增的，则用zend_hash_update_mem添加一条。
+```c
+    file_key = php_yaconf_str_persistent(namelist[i]->d_name, p - namelist[i]->d_name);
+    if ((orig_ht = zend_symtable_find(ini_containers, file_key)) != NULL) {
+        php_yaconf_hash_destroy(Z_ARRVAL_P(orig_ht));
+        ZVAL_COPY_VALUE(orig_ht, &result);
+        free(file_key);
+    } else {
+        php_yaconf_symtable_update(ini_containers, file_key, &result);
+    }
 
-    if ((dirname = YACONF_G(directory)) && !VCWD_STAT(dirname, &dir_sb) && S_ISDIR(dir_sb.st_mode)) {
-        if (dir_sb.st_mtime == YACONF_G(directory_mtime)) {
-            // 检测目标配置文件的路径是否是常规路径和检测
-            YACONF_DEBUG("config directory is not modefied");
-            return SUCCESS;
-        } else {
-            zval result;
-            int i, ndir;
-            struct dirent **namelist;
-            char *p, ini_file[MAXPATHLEN]; // MAXPATHLEN = 256
+    if (node) {
+        node->mtime = sb.st_mtime;
+    } else {
+        yaconf_filenode n = {0};
+        n.filename = zend_string_init(namelist[i]->d_name, strlen(namelist[i]->d_name), 1);
+        n.mtime = sb.st_mtime;
+        zend_hash_update_mem(parsed_ini_files, n.filename, &n, sizeof(yaconf_filenode));
+    }  
 
-            YACONF_G(directory_mtime) = dir_sb.st_mtime;
-
-            if ((ndir = php_scandir(dirname, &namelist, 0, php_alphasort)) > 0) {
-                // 检索文件夹里的有效文件
-                // ndir 是返回值
-                zend_string *file_key;
-                struct zend_stat sb;
-                zend_file_handle fh = {0};
-                yaconf_filenode *node = NULL;
-
-                for (i = 0; i < ndir; i++) {
-                    zval *orig_ht = NULL;
-                    if (!(p = strrchr(namelist[i]->d_name, '.')) || strcmp(p, ".ini")) {
-                        // 返回 . 首次出现的位置，并且返回从这个开始的字符串
-                        // 所以 a.b.ini 不符合条件
-                        free(namelist[i]);
-                        continue;
-                    }
-
-                    snprintf(ini_file, MAXPATHLEN, "%s%c%s", dirname, DEFAULT_SLASH, namelist[i]->d_name);
-
-                    // 单个文件目录+文件  最多255个字符
-                    if (VCWD_STAT(ini_file, &sb) || !S_ISREG(sb.st_mode)) {
-                        free(namelist[i]);
-                        continue;
-                    }
-
-                    // 从ini 文件记录表中 找到文件的mtime和文件的mtime进行比对 如果相等则pass
-                    if ((node = (yaconf_filenode*)zend_hash_str_find_ptr(parsed_ini_files, namelist[i]->d_name, strlen(namelist[i]->d_name))) == NULL) {
-                        YACONF_DEBUG("new configure file found");
-                    } else if (node->mtime == sb.st_mtime) {
-                        free(namelist[i]);
-                        continue;
-                    }
-
-                    if ((fh.handle.fp = VCWD_FOPEN(ini_file, "r"))) {
-                        fh.filename = ini_file;
-                        fh.type = ZEND_HANDLE_FP;
-                        ZVAL_UNDEF(&active_ini_file_section);
-                        YACONF_G(parse_err) = 0;
-                        php_yaconf_hash_init(&result, 128);
-
-                        if (zend_parse_ini_file(&fh, 1, 0 /* ZEND_INI_SCANNER_NORMAL */,
-                                php_yaconf_ini_parser_cb, (void *)&result) == FAILURE || YACONF_G(parse_err)) {
-                            YACONF_G(parse_err) = 0;
-                            php_yaconf_hash_destroy(Z_ARRVAL(result));
-                            free(namelist[i]);
-                            continue;
-                        }
-                    }
-
-
-                    file_key = php_yaconf_str_persistent(namelist[i]->d_name, p - namelist[i]->d_name);
-                    if ((orig_ht = zend_symtable_find(ini_containers, file_key)) != NULL) {
-                        php_yaconf_hash_destroy(Z_ARRVAL_P(orig_ht));
-                        ZVAL_COPY_VALUE(orig_ht, &result);
-                        free(file_key);
-                    } else {
-                        php_yaconf_symtable_update(ini_containers, file_key, &result);
-                    }
-
-                    if (node) {
-                        node->mtime = sb.st_mtime;
-                    } else {
-                        yaconf_filenode n = {0};
-                        n.filename = zend_string_init(namelist[i]->d_name, strlen(namelist[i]->d_name), 1);
-                        n.mtime = sb.st_mtime;
-                        zend_hash_update_mem(parsed_ini_files, n.filename, &n, sizeof(yaconf_filenode));
-                    }
-                    free(namelist[i]);
-                }
-                free(namelist);
-            }
-            return SUCCESS;
-        }
-    } 
 ```
 
-
+注意：
+1. 最后需要释放掉一些使用的空间，如在过程中记录遍历文件的列表变量namelist。
+2. 如果已经加载了a.ini的配置信息，如果a.ini删除，在PHP_RINIT_FUNCTION和上面update方法中不能清除配置，需要进行PHP_MINIT_FUNCTION重新加载，即php-fpm重启。
 
 在yaconf.c中定义类的方法update。调用php_yaconf_update方法：
 ```c

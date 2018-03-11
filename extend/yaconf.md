@@ -146,7 +146,6 @@ ZEND_END_MODULE_GLOBALS(yaconf)
     	PHP_RSHUTDOWN(yaconf),
     	...
     };
-
 ```
 3. 从配置ini文件中读取istest和directory_test这两个变量。
 ```c
@@ -164,7 +163,6 @@ ZEND_END_MODULE_GLOBALS(yaconf)
     if (YACONF_G(istest)) {
         php_yaconf_create_testini();
     }
-
 ```
 5. php_yaconf_create_testini的实现，如果是测试模式，遍历测试目录directory_test，写入test_ini_containers里面。方法大致同上面update方法。
 
@@ -187,7 +185,6 @@ ZEND_END_MODULE_GLOBALS(yaconf)
         } 
         return SUCCESS;
     }
-
 ```
 ### 后记
 在测试模式下，后续可以根据请求的host和port进行加载不同的配置文件，如有兴趣，大家一起研究。

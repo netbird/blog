@@ -38,7 +38,7 @@ END_EXTERN_C()
 然后进行遍历文件夹的文件。注意:这里不会去遍历配置文件夹下的二层文件夹的内容。
 对于每个文件进行如下检测：
 
->1 检测文件名字是否是abc.ini的格式，如果出现其他格式则pass。
+1. 检测文件名字是否是abc.ini的格式，如果出现其他格式则pass。
 ```c
     if (!(p = strrchr(namelist[i]->d_name, '.')) || strcmp(p, ".ini")) {
         // 返回 . 首次出现的位置，并且返回从这个开始的字符串
@@ -108,3 +108,4 @@ END_EXTERN_C()
         RETURN_BOOL(php_yaconf_update());
     }
 ```
+### 添加测试模式

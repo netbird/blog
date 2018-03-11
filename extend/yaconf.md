@@ -75,7 +75,6 @@ END_EXTERN_C()
         continue;
     }
 ```
-
 5. 如果是对已有配置的更新，则先删除之前的配置。然后挂载新的配置。如果是新的则直接更新hashtable ini_containers。
 并且同步更新记录加载了文件信息的hashtable parsed_ini_files，如果是update则直接 更新对应节点的mtime, 如果是新增的，则用zend_hash_update_mem添加一条。
 ```c
@@ -104,8 +103,8 @@ END_EXTERN_C()
 
 在yaconf.c中定义类的方法update。调用php_yaconf_update方法：
 ```c
-PHP_METHOD(yaconf, update) {
-	
-	RETURN_BOOL(php_yaconf_update());
-}
+    PHP_METHOD(yaconf, update) {
+        
+        RETURN_BOOL(php_yaconf_update());
+    }
 ```

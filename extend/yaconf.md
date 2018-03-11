@@ -96,7 +96,6 @@ END_EXTERN_C()
         n.mtime = sb.st_mtime;
         zend_hash_update_mem(parsed_ini_files, n.filename, &n, sizeof(yaconf_filenode));
     }  
-
 ```
 
 注意：

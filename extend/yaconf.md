@@ -24,6 +24,16 @@ PHP_YACONF_API int php_yaconf_update();
 ...
 END_EXTERN_C()
 ```
+
+在yaconf.c中类的方法声明中添加方法update，没有参数，第三个参数设置成null，静态方法，public访问权限。
+```c
+    zend_function_entry yaconf_methods[] = {
+        PHP_ME(yaconf, get, php_yaconf_get_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+        PHP_ME(yaconf, has, php_yaconf_has_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+        PHP_ME(yaconf, update, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+        {NULL, NULL, NULL}
+    };
+```
 在yaconf.c中实现上面这个php_yaconf_update方法, 基本copy了PHP_RINIT_FUNCTION中的逻辑。
 检测是否存在check_delay这个字段和是否超过单次时间检测，如果没有超过则返回。
 
@@ -108,4 +118,77 @@ END_EXTERN_C()
         RETURN_BOOL(php_yaconf_update());
     }
 ```
+
+----
+
 ### 添加测试模式
+首先在php_yaconf.h里面添加全局配置项目。
+```c
+ZEND_BEGIN_MODULE_GLOBALS(yaconf)
+    ...
+    zend_bool istest; // true or false 
+    char *directory_test; // test directory if istest=true
+    ...
+ZEND_END_MODULE_GLOBALS(yaconf)
+```
+声明PHP_RSHUTDOWN_FUNCTION方法，用于请求结束后，回收测试模式的资源。
+
+下面介绍yaconf.c里面的内容。
+1. 添加静态变量test_ini_containers, HashTable指针类型，用于保存测试配置项。
+```c
+    static HashTable *test_ini_containers;
+```
+
+2. 在yaconf_module_entry中添加PHP_RSHUTDOWN方法，否则无效。
+```c
+    zend_module_entry yaconf_module_entry = {
+    	...
+    	PHP_RSHUTDOWN(yaconf),
+    	...
+    };
+
+```
+3. 从配置ini文件中读取istest和directory_test这两个变量。
+```c
+    PHP_INI_BEGIN()
+        STD_PHP_INI_ENTRY("yaconf.directory", "", PHP_INI_SYSTEM, OnUpdateString, directory, zend_yaconf_globals, yaconf_globals)
+        STD_PHP_INI_ENTRY("yaconf.istest", "0", PHP_INI_SYSTEM, OnUpdateBool, istest, zend_yaconf_globals, yaconf_globals)
+        STD_PHP_INI_ENTRY("yaconf.directory_test", "", PHP_INI_SYSTEM, OnUpdateString, directory_test, zend_yaconf_globals, yaconf_globals)
+    #ifndef ZTS
+        STD_PHP_INI_ENTRY("yaconf.check_delay", "300", PHP_INI_SYSTEM, OnUpdateLong, check_delay, zend_yaconf_globals, yaconf_globals)
+    #endif
+    PHP_INI_END()
+```
+4. 每次请求来的时候，先判断是否是测试模式，即在PHP_RINIT_FUNCTION中添加方法。
+```c
+    if (YACONF_G(istest)) {
+        php_yaconf_create_testini();
+    }
+
+```
+5. php_yaconf_create_testini的实现，如果是测试模式，遍历测试目录directory_test，写入test_ini_containers里面。方法大致同上面update方法。
+
+6. yaconf的静态方法get, has改造。添加如果是测试模式，优先进行test_ini_containers中读取，
+没有的话，再从ini_containers中查找。
+```c
+    if (YACONF_G(istest)) {
+        val = php_yaconf_get_test(name);
+    }
+    if (!val) {
+        val = php_yaconf_get(name);
+    }
+```
+7. 请求结束后如果是测试模式，并且有加载测试内容，释放资源。在PHP_MSHUTDOWN_FUNCTION同样做此处理。
+```c
+    PHP_RSHUTDOWN_FUNCTION(yaconf)
+    {
+        if (YACONF_G(istest) && test_ini_containers) {
+            php_yaconf_hash_destroy(test_ini_containers);
+        } 
+        return SUCCESS;
+    }
+
+```
+### 后记
+在测试模式下，后续可以根据请求的host和port进行加载不同的配置文件，如有兴趣，大家一起研究。
+

@@ -138,7 +138,6 @@ ZEND_END_MODULE_GLOBALS(yaconf)
 ```c
     static HashTable *test_ini_containers;
 ```
-
 2. 在yaconf_module_entry中添加PHP_RSHUTDOWN方法，否则无效。
 ```c
     zend_module_entry yaconf_module_entry = {

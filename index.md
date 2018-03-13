@@ -12,11 +12,11 @@
 目录:
 
 ### base function
->* [ self_concats ](https://netbird.github.io/blog/array/self_concats)
->* [ array_get ](https://netbird.github.io/blog/array/array_get)
+>* [ self_concats ](https://netbird.github.io/array/self_concats)
+>* [ array_get ](https://netbird.github.io/array/array_get)
 
 ### extension tes
->* [ yaconf测试及二次编辑 ](https://netbird.github.io/blog/extend/yaconf)
+>* [ yaconf测试及二次编辑 ](https://netbird.github.io/extend/yaconf)
 
 ---
 #### 微博：[@福愿_飞鸟](https://weibo.com/teacherbird/home?wvr=5)

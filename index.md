@@ -84,7 +84,7 @@ PHP_FUNCTION(array_diff_assoc);
 PHP_FUNCTION(array_udiff_assoc);
 PHP_FUNCTION(array_diff_uassoc);
 PHP_FUNCTION(array_udiff_uassoc);
-PHP_FUNCTION(array_sum);
+>* [ array_sum ](https://netbird.github.io/array/array_sum)
 PHP_FUNCTION(array_product);
 PHP_FUNCTION(array_filter);
 PHP_FUNCTION(array_map);

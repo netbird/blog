@@ -11,10 +11,12 @@
 
 目录:
 
-### base function
+### extend function add by fuyuan
 >* [ self_concats ](https://netbird.github.io/array/self_concats)
 >* [ array_get ](https://netbird.github.io/array/array_get)
 
+### base function (ext/standard/array.c)
+>* [ array_sum ](https://netbird.github.io/array/array_sum)
 ```
 PHP_FUNCTION(ksort);
 PHP_FUNCTION(krsort);
@@ -84,7 +86,7 @@ PHP_FUNCTION(array_diff_assoc);
 PHP_FUNCTION(array_udiff_assoc);
 PHP_FUNCTION(array_diff_uassoc);
 PHP_FUNCTION(array_udiff_uassoc);
->* [ array_sum ](https://netbird.github.io/array/array_sum)
+
 PHP_FUNCTION(array_product);
 PHP_FUNCTION(array_filter);
 PHP_FUNCTION(array_map);

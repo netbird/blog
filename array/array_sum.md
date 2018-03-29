@@ -59,7 +59,7 @@ convert_scalar_to_number(&entry_n);
 ```c
 fast_add_function(return_value, return_value, &entry_n);
 ```
-fast_add_function具体底层实现：
+fast_add_function具体底层实现(扩展以下)：
 ```c
 static zend_always_inline int fast_add_function(zval *result, zval *op1, zval *op2)
 {

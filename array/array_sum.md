@@ -1,4 +1,5 @@
 ## array_sum
+
 ----
 对array内的所有元素加合
 整体代码在ext/standard/array.c，代码如下：

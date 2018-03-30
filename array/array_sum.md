@@ -5,8 +5,6 @@
 整体代码在ext/standard/array.c，代码如下：
 
 ```c
-    /* {{{ proto mixed array_sum(array input)
-       Returns the sum of the array entries */
     PHP_FUNCTION(array_sum)
     {
     	zval *input,

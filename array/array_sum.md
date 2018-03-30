@@ -3,6 +3,7 @@
 ----
 对array内的所有元素加合
 整体代码在ext/standard/array.c，代码如下：
+
 ```c
     /* {{{ proto mixed array_sum(array input)
        Returns the sum of the array entries */
@@ -11,7 +12,7 @@
     	zval *input,
     		 *entry,
     		 entry_n;
-    
+
     	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &input) == FAILURE) {
     		return;
     	}
@@ -28,8 +29,8 @@
     	} ZEND_HASH_FOREACH_END();
     }
     /* }}} */
-
 ```
+
 首先声明变量类型为zval指针类型input，接收参数。设置返回值为0。
 ```c
    zval *input

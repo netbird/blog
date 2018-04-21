@@ -27,8 +27,8 @@
 
 ### 非技术感悟
 >* 怎么样5A过PMP考试 [怎么样5A过PMP考试](http://blog.sina.com.cn/s/blog_4d88b5b50102xc49.html)
->* 解决一个小问题联想对一个项目的感悟 [解决一个小问题联想对一个项目的小感悟] (http://blog.sina.com.cn/s/blog_4d88b5b50102xbnb.html)
->* 一些经验总结
+>* 解决一个小问题联想对一个项目的感悟 [解决一个小问题联想对一个项目的小感悟](http://blog.sina.com.cn/s/blog_4d88b5b50102xbnb.html)
+>* 未完待续。。。
 
 ### docker相关
 

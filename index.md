@@ -1,11 +1,12 @@
 ## 初篇介绍
 
 ----
-### 飞鸟 
+
+### 飞鸟 (weibo: [@福愿_飞鸟](https://weibo.com/teacherbird/home?wvr=5) )
     飞鸟，笨鸟先飞，取名之时，感觉自己不够聪明，但是还要努力，赶上大部队的进度，取名笨鸟先飞，鞭策自己。
     改名飞鸟，寓意，不仅要笨鸟先飞，而且要高飞，站在枝头看风景，左手执剑，右手酒。。。
     
-    微博：[@福愿_飞鸟](https://weibo.com/teacherbird/home?wvr=5)
+    
     
 ```h2
 天津财经大学08年计算机科班出身 
@@ -17,6 +18,7 @@
 17 18年参加北京长跑节半马，成绩逐渐刷新PB
 18年过PMP考试，5A成绩
 一直从事互联网功能开发 砥砺前行 不曾停步。。。
+
 ```
 
 ### 本博客包括：
@@ -36,7 +38,8 @@
 >* [ array_sum ](https://netbird.github.io/array/array_sum)
 
 >* [ gettext ](/extend/gettext)
-```
+
+````c
 PHP_FUNCTION(ksort);
 PHP_FUNCTION(krsort);
 PHP_FUNCTION(natsort);
@@ -112,7 +115,7 @@ PHP_FUNCTION(array_map);
 PHP_FUNCTION(array_key_exists);
 PHP_FUNCTION(array_chunk);
 PHP_FUNCTION(array_combine);
-```
+````
 
 ### extension tes
 >* [ yaconf测试及二次编辑 ](https://netbird.github.io/extend/yaconf)

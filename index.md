@@ -23,7 +23,12 @@
 >* 非技术领域
 >* 一起分析一些扩展开发
 
-### 项目感悟
+----
+
+### 非技术感悟
+>* 怎么样5A过PMP考试 [怎么样5A过PMP考试](http://blog.sina.com.cn/s/blog_4d88b5b50102xc49.html)
+>* 解决一个小问题联想对一个项目的感悟 [解决一个小问题联想对一个项目的小感悟] (http://blog.sina.com.cn/s/blog_4d88b5b50102xbnb.html)
+>* 一些经验总结
 
 ### docker相关
 
@@ -32,14 +37,14 @@
 ### android手机
 
 ### H5相关前端开发
->* React[antd admin学习](/h5/antd_admin)
->* Vue[vue学习](/h5/vue)
+>* React [antd admin学习](/h5/antd_admin)
+>* Vue [vue学习](/h5/vue)
 
 ### php开发
 >* 暂未开放
 
-### php扩展 [php扩展](/h5/antd_admin)
-
+### php扩展
+>* [php-fpm运行时扩展里面MINIT,MSHUTDOWN,RINIT,RSHUTDOWN四个函数的执行过程](http://blog.sina.com.cn/s/blog_4d88b5b50102wu8i.html)
 ----
 
 ### extend function add by fuyuan

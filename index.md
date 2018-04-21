@@ -6,8 +6,6 @@
     飞鸟，笨鸟先飞，取名之时，感觉自己不够聪明，但是还要努力，赶上大部队的进度，取名笨鸟先飞，鞭策自己。
     改名飞鸟，寓意，不仅要笨鸟先飞，而且要高飞，站在枝头看风景，左手执剑，右手酒。。。
     
-    
-    
 ```h2
 天津财经大学08年计算机科班出身 
 毕业十年 也曾犹豫 也曾迷惘 也曾经历人生起落
@@ -27,8 +25,24 @@
 >* 非技术领域
 >* 一起分析一些扩展开发
 
-### 前端开发
->* [antd admin学习](/h5/antd_admin)
+### 项目感悟
+
+### docker相关
+
+### 人工智能
+
+### android手机
+
+### H5相关前端开发
+>* React[antd admin学习](/h5/antd_admin)
+>* Vue[vue学习](/h5/vue)
+
+### php开发
+>* 暂未开放
+
+### php扩展 [php扩展](/h5/antd_admin)
+
+----
 
 ### extend function add by fuyuan
 >* [ self_concats ](https://netbird.github.io/array/self_concats)

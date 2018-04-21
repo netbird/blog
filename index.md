@@ -44,7 +44,9 @@
 >* 暂未开放
 
 ### php扩展
->* [php-fpm运行时扩展里面MINIT,MSHUTDOWN,RINIT,RSHUTDOWN四个函数的执行过程](http://blog.sina.com.cn/s/blog_4d88b5b50102wu8i.html)
+
+>* php-fpm运行时扩展里面MINIT,MSHUTDOWN,RINIT,RSHUTDOWN四个函数的执行过程 [阅读](http://blog.sina.com.cn/s/blog_4d88b5b50102wu8i.html)
+
 ----
 
 ### extend function add by fuyuan
